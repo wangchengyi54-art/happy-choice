@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>幸福二选一 · 锦标赛</title>
+<style>
+  :root{
+    --bg1:#ffd6e7; --bg2:#ffe9c7;
+    --accent:#ff5e8a; --accent2:#ff8f5e;
+    --card:#ffffff; --ink:#3a2b33; --sub:#9a8590;
+    --win:#ff5e8a; --lose:#e6e6ea;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+    color:var(--ink);
+    background:linear-gradient(160deg,var(--bg1),var(--bg2));
+    min-height:100vh;min-height:100dvh;
+    display:flex;flex-direction:column;align-items:center;
+    padding:env(safe-area-inset-top) 16px env(safe-area-inset-bottom);
+    overflow-x:hidden;
+  }
+  .wrap{width:100%;max-width:520px;flex:1;display:flex;flex-direction:column;}
+  header{padding:22px 4px 8px;text-align:center;}
+  header h1{margin:0;font-size:26px;letter-spacing:2px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  header p{margin:6px 0 0;font-size:13px;color:var(--sub);letter-spacing:1px;}
+
+  /* start */
+  #start{display:flex;flex:1;flex-direction:column;justify-content:center;align-items:center;gap:18px;}
+  #start .emoji{font-size:64px;animation:bob 2.4s ease-in-out infinite;}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  #start .tip{font-size:14px;color:var(--sub);text-align:center;line-height:1.7;padding:0 18px;}
+  #start .bracket-mini{font-size:12px;color:var(--sub);margin-top:8px;line-height:1.6;text-align:center;}
+
+  .btn{
+    border:none;cursor:pointer;font-family:inherit;font-weight:700;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    color:#fff;border-radius:999px;padding:14px 40px;font-size:17px;
+    box-shadow:0 8px 20px rgba(255,94,138,.35);transition:transform .12s,box-shadow .12s;
+  }
+  .btn:active{transform:scale(.95);box-shadow:0 4px 12px rgba(255,94,138,.3);}
+  .btn.ghost{background:#fff;color:var(--accent);box-shadow:0 4px 14px rgba(0,0,0,.06);}
+
+  /* game */
+  #game{display:none;flex:1;flex-direction:column;}
+  .progress{display:flex;justify-content:space-between;align-items:center;
+    font-size:13px;color:var(--sub);padding:4px 6px 10px;}
+  .progress .count{font-weight:700;color:var(--accent);font-size:15px;}
+  .round-tag{display:inline-block;background:#fff;border:1px solid #f4d4e1;border-radius:8px;
+    padding:3px 10px;font-size:11px;color:var(--accent);letter-spacing:1px;margin-bottom:10px;text-align:center;}
+  .round-tag b{color:var(--accent2);}
+
+  .vs{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:stretch;}
+  .card{
+    background:var(--card);border-radius:22px;padding:24px 14px;min-height:170px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+    font-size:22px;font-weight:800;line-height:1.35;cursor:pointer;
+    box-shadow:0 10px 26px rgba(180,90,120,.18);
+    border:3px solid transparent;transition:transform .12s,border-color .15s,opacity .15s;
+    user-select:none;position:relative;word-break:break-all;
+  }
+  .card small{display:block;font-size:11px;font-weight:600;color:var(--sub);margin-bottom:8px;letter-spacing:2px;}
+  .card:active{transform:scale(.97);}
+  .card.pick{border-color:var(--accent);background:#fff5f8;}
+  .card.dim{opacity:.4;}
+
+  .or{display:flex;justify-content:center;align-items:center;color:var(--accent);
+    font-weight:800;font-size:14px;margin:12px 0;letter-spacing:1px;}
+
+  .trail{padding:14px 6px 6px;}
+  .trail-title{font-size:12px;color:var(--sub);letter-spacing:1px;margin-bottom:8px;}
+  .trail-list{display:flex;flex-wrap:wrap;gap:6px;}
+  .chip{background:#fff5f8;border:1px solid #f4d4e1;color:var(--accent);border-radius:999px;
+    padding:5px 11px;font-size:12px;font-weight:600;}
+
+  .actions{display:flex;gap:10px;margin-top:14px;}
+  .actions .btn{flex:1;padding:11px 0;font-size:13px;}
+  .hint{text-align:center;font-size:12px;color:var(--sub);margin-top:10px;letter-spacing:1px;}
+
+  /* winner screen */
+  #final{display:none;flex:1;flex-direction:column;justify-content:center;align-items:center;
+    text-align:center;padding:30px 16px;gap:18px;}
+  #final .crown{font-size:72px;animation:bob 2.4s ease-in-out infinite;}
+  #final .winner{
+    background:linear-gradient(135deg,#fff5f8,#fff0e0);
+    border:3px solid var(--accent);border-radius:24px;padding:24px 36px;
+    font-size:30px;font-weight:900;letter-spacing:3px;color:var(--accent);
+    box-shadow:0 14px 30px rgba(255,94,138,.3);
+  }
+  #final .stat{font-size:14px;color:var(--sub);line-height:1.8;}
+  #final .path{font-size:12px;color:var(--sub);margin-top:6px;}
+  #final .path-chip{display:inline-block;background:#fff;border:1px solid #f4d4e1;border-radius:8px;
+    padding:3px 8px;margin:2px;}
+
+  /* modal */
+  .mask{position:fixed;inset:0;background:rgba(40,20,30,.55);display:none;
+    align-items:center;justify-content:center;padding:20px;z-index:50;backdrop-filter:blur(3px);}
+  .mask.show{display:flex;}
+  .sheet{background:#fff;border-radius:24px;width:100%;max-width:460px;max-height:82vh;
+    display:flex;flex-direction:column;overflow:hidden;animation:rise .2s ease;
+    position:relative;}
+  @keyframes rise{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .sheet h2{margin:0;padding:18px 20px 10px;font-size:18px;text-align:center;}
+  .sheet .sub{text-align:center;font-size:12px;color:var(--sub);margin-bottom:6px;}
+  .list{overflow-y:auto;padding:8px 18px 18px;-webkit-overflow-scrolling:touch;}
+  .round-h{display:flex;align-items:center;gap:8px;margin:12px 0 6px;font-size:12px;color:var(--sub);
+    letter-spacing:1px;}
+  .round-h b{color:var(--accent);font-size:14px;}
+  .row{display:flex;justify-content:space-between;align-items:center;
+    padding:10px 14px;border-radius:12px;margin-bottom:6px;font-size:14px;}
+  .row.win{background:#fff5f8;color:var(--accent);font-weight:700;}
+  .row.lose{background:#f5f5f8;color:#aaa;}
+  .row .t{flex:1;}
+  .empty{text-align:center;color:var(--sub);padding:30px 0;font-size:14px;}
+  .sheet .foot{padding:12px 18px 18px;}
+  .sheet .foot .btn{width:100%;}
+  .closeX{position:absolute;top:14px;right:18px;font-size:22px;color:var(--sub);cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>幸福二选一</h1>
+    <p>锦标赛制 · 自己人专属</p>
+  </header>
+
+  <section id="start">
+    <div class="emoji">🏆</div>
+    <div class="tip">46 个 xp · 5 轮对决<br>选出你心里的 No.1</div>
+    <div class="bracket-mini">
+      第1轮：46进23 → 第2轮：23进12<br>
+      第3轮：12进6 → 第4轮：6进3<br>
+      第5轮：3进2 → 决赛：决出冠军 🏆
+    </div>
+    <button class="btn" id="startBtn">开 始</button>
+  </section>
+
+  <section id="game">
+    <div class="progress">
+      <span>已选 <span class="count" id="count">0</span> 个</span>
+      <span id="roundLabel"></span>
+    </div>
+    <div class="round-tag" id="roundTag"></div>
+    <div class="vs">
+      <div class="card" id="cardA" onclick="choose(0)"><small>选这个</small><span></span></div>
+      <div class="card" id="cardB" onclick="choose(1)"><small>选这个</small><span></span></div>
+    </div>
+    <div class="or">— 二 选 一 —</div>
+    <div class="trail">
+      <div class="trail-title">本届已晋级</div>
+      <div class="trail-list" id="trail"></div>
+    </div>
+    <div class="actions">
+      <button class="btn ghost" onclick="openSheet()">赛程记录</button>
+    </div>
+    <div class="hint">点卡片即选择，胜者晋级下一轮</div>
+  </section>
+
+  <section id="final">
+    <div class="crown">👑</div>
+    <div style="font-size:14px;color:var(--sub);letter-spacing:2px;">本届冠军 xp</div>
+    <div class="winner" id="winnerName">—</div>
+    <div class="stat" id="finalStat"></div>
+    <div class="path" id="path"></div>
+    <div class="actions" style="width:100%;max-width:340px;">
+      <button class="btn" onclick="openSheet()">查看完整赛程</button>
+      <button class="btn ghost" onclick="resetGame()">重新开始</button>
+    </div>
+  </section>
+</div>
+
+<div class="mask" id="mask">
+  <div class="sheet">
+    <span class="closeX" onclick="closeSheet()">✕</span>
+    <h2>完整赛程</h2>
+    <div class="sub" id="sheetSub"></div>
+    <div class="list" id="list"></div>
+    <div class="foot"><button class="btn" onclick="resetGame()">重新开始</button></div>
+  </div>
+</div>
+
+<script>
+// 46 个 xp 标签，按表格顺序
+const ITEMS = ["恨海情天","破镜重圆","镜花水月","枯木逢春","烂人真心","圣人私心","明月高悬","欢喜冤家","宿敌变挚友","挚友变宿敌","宿敌","挚友","相爱相杀","师徒","骨科","伪骨科","爱而不得","先婚后爱","强制爱","默默守护","青梅竹马","天降","年上","年下","救赎","一起腐烂","暗恋","明恋","双强","霸总娇妻","追妻火葬场","追夫火葬场","老夫老妻","对抗路","露水姻缘","白头偕老","日久生情","一见钟情","君臣","主仆","前世今生","错位时空","兰因絮果","莞莞类卿","明媒正娶","地下情"];
+
+// 锦标赛对局树：每轮是"上一轮胜者"的两两对决
+// 第1轮：46 个按 A 列顺序两两分组
+// 第2轮：第1轮胜者两两对决 ... 直到冠军
+// 不均匀轮次（46→23→12→6→3→2→1）里，奇数位自动轮空晋级下一轮
+function buildBracket(){
+  const rounds = [];
+  let cur = ITEMS.slice();
+  while(cur.length > 1){
+    const next = [];
+    const pairings = [];
+    for(let i=0;i<cur.length;i+=2){
+      if(i+1 < cur.length){
+        pairings.push([cur[i], cur[i+1]]);
+        next.push(null); // 占位，胜者赛后再填
+      } else {
+        // 轮空：直接晋级
+        next.push(cur[i]);
+      }
+    }
+    rounds.push(pairings);
+    cur = next;
+  }
+  return {rounds, slots: rounds.map(()=>[])};
+}
+
+const BR = buildBracket();
+
+// 每轮的标题
+const ROUND_NAMES = ["第1轮 · 46进23","第2轮 · 23进12","第3轮 · 12进6","第4轮 · 6进3","第5轮 · 3进2","决赛 · 冠军"];
+let ri = 0;          // 当前轮次 index
+let pi = 0;          // 当前轮中第几个 pair
+let history = [];    // [{round, idx, a, b, pick, allAfter}] 全程记录
+let winners = [];    // 每轮产生的胜者，索引 ri -> [w1,w2,...]
+let locked = false;
+let totalPicks = 0;
+
+function loadPair(){
+  const pair = BR.rounds[ri][pi];
+  document.querySelector('#cardA span').textContent = pair[0];
+  document.querySelector('#cardB span').textContent = pair[1];
+  document.getElementById('cardA').classList.remove('pick','dim');
+  document.getElementById('cardB').classList.remove('pick','dim');
+  document.getElementById('roundTag').innerHTML =
+    `本轮 <b>${ROUND_NAMES[ri]}</b>　对战 <b>${pi+1}/${BR.rounds[ri].length}</b>`;
+  document.getElementById('roundLabel').textContent =
+    `总进度 ${totalRound()+1} / ${totalRounds()}`;
+  locked = false;
+  renderTrail();
+}
+
+function totalRounds(){
+  let n=0; BR.rounds.forEach(r=>n+=r.length); return n;
+}
+function totalRound(){
+  let n=0;
+  for(let i=0;i<ri;i++) n += BR.rounds[i].length;
+  return n + pi;
+}
+
+function choose(i){
+  if(locked) return;
+  locked = true;
+  const pair = BR.rounds[ri][pi];
+  const win = pair[i], lose = pair[1-i];
+  // 记录本场
+  history.push({round:ri, idx:pi, a:pair[0], b:pair[1], pick:win});
+  totalPicks++;
+
+  // 推入本轮胜者
+  if(!winners[ri]) winners[ri] = [];
+  winners[ri].push(win);
+
+  document.getElementById('cardA').classList.toggle('pick', i===0);
+  document.getElementById('cardB').classList.toggle('pick', i===1);
+  document.getElementById(i===0?'cardB':'cardA').classList.add('dim');
+  document.getElementById('count').textContent = totalPicks;
+
+  // 是否晋级到下一轮？
+  const totalInRound = BR.rounds[ri].length;
+  const winCount = winners[ri].length;
+  const lastWasBye = (ITEMS.length % 2 === 0 ? false : false); // 我们已在 buildBracket 里处理轮空
+  setTimeout(()=>{
+    pi++;
+    if(pi < totalInRound){
+      loadPair();
+    } else {
+      // 本轮结束
+      ri++;
+      pi = 0;
+      // 把胜者写入下一轮的占位
+      const prevWinners = winners[ri-1];
+      // 下一轮的 pair 中第二个元素需要从 winners 里取
+      // 因为 buildBracket 里 next=Array(totalInRound/2).fill(null)，位置 0,2,4...对应 winners[0],winners[2]...
+      for(let i=0,k=0;i<BR.rounds[ri].length;i++){
+        BR.rounds[ri][i][0] = prevWinners[k];
+        BR.rounds[ri][i][1] = prevWinners[k+1];
+        k+=2;
+      }
+      if(BR.rounds[ri].length === 0){
+        // 全部结束
+        showFinal(prevWinners[0]);
+      } else {
+        loadPair();
+      }
+    }
+  }, 260);
+}
+
+function renderTrail(){
+  // 显示已产生的所有胜者 chip
+  const box = document.getElementById('trail');
+  const all = [];
+  for(let i=0;i<ri;i++){
+    (winners[i]||[]).forEach(w=>all.push({r:i, w}));
+  }
+  if(all.length===0){
+    box.innerHTML = '<span style="color:#bbb;font-size:12px;">（暂未产生）</span>';
+    return;
+  }
+  box.innerHTML = all.map(x=>`<span class="chip" title="${ROUND_NAMES[x.r]}">${x.w}</span>`).join('');
+}
+
+function showFinal(champ){
+  document.getElementById('game').style.display='none';
+  document.getElementById('final').style.display='flex';
+  document.getElementById('winnerName').textContent = champ;
+  document.getElementById('finalStat').innerHTML =
+    `共经历 <b style="color:var(--accent)">${totalPicks}</b> 次抉择<br>本届冠军已诞生 👑`;
+
+  // 提取冠军的晋级路径：从每一轮 history 里找包含该标签的胜场
+  const path = [];
+  history.forEach(h=>{ if(h.pick===champ) path.push({r:h.round, beat: h.a===champ?h.b:h.a}); });
+  document.getElementById('path').innerHTML = '冠军之路：' +
+    path.map(p=>`<span class="path-chip">击败「${p.beat}」</span>`).join(' ');
+}
+
+function openSheet(){
+  // 把 history 按轮分组展示
+  const box = document.getElementById('list');
+  const byRound = [];
+  history.forEach(h=>{
+    if(!byRound[h.round]) byRound[h.round] = [];
+    byRound[h.round].push(h);
+  });
+  let html = '';
+  for(let r=0;r<byRound.length;r++){
+    if(!byRound[r]) continue;
+    html += `<div class="round-h">第 <b>${r+1}</b> 轮 · ${ROUND_NAMES[r]||'决赛'}</div>`;
+    byRound[r].forEach((h,i)=>{
+      const win = h.pick, lose = h.a===win?h.b:h.a;
+      html += `<div class="row win"><span class="t">✓ ${win}</span><span style="font-size:12px;color:var(--sub);">胜</span></div>
+               <div class="row lose"><span class="t">${lose}</span><span style="font-size:12px;color:#ccc;">负</span></div>`;
+    });
+  }
+  if(!html) html = '<div class="empty">还没开始呢～</div>';
+  box.innerHTML = html;
+  document.getElementById('sheetSub').textContent = `共 ${totalPicks} 次抉择 · 走过 ${byRound.filter(Boolean).length} 轮`;
+  document.getElementById('mask').classList.add('show');
+}
+function closeSheet(){ document.getElementById('mask').classList.remove('show'); }
+
+function resetGame(){
+  // 重新构建对局树
+  const fresh = buildBracket();
+  BR.rounds.length = 0;
+  fresh.rounds.forEach(r=>BR.rounds.push(r));
+  ri=0;pi=0;history=[];winners=[];totalPicks=0;locked=false;
+  document.getElementById('count').textContent='0';
+  document.getElementById('final').style.display='none';
+  document.getElementById('game').style.display='flex';
+  closeSheet();
+  loadPair();
+}
+
+document.getElementById('startBtn').onclick=()=>{
+  document.getElementById('start').style.display='none';
+  document.getElementById('game').style.display='flex';
+  loadPair();
+};
+document.getElementById('mask').onclick=(e)=>{ if(e.target.id==='mask') closeSheet(); };
+</script>
+</body>
+</html>
