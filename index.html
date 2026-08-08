@@ -9,7 +9,6 @@
     --bg1:#ffd6e7; --bg2:#ffe9c7;
     --accent:#ff5e8a; --accent2:#ff8f5e;
     --card:#ffffff; --ink:#3a2b33; --sub:#9a8590;
-    --win:#ff5e8a; --lose:#e6e6ea;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;height:100%;}
@@ -23,13 +22,13 @@
     overflow-x:hidden;
   }
   .wrap{width:100%;max-width:520px;flex:1;display:flex;flex-direction:column;}
+
   header{padding:22px 4px 8px;text-align:center;}
   header h1{margin:0;font-size:26px;letter-spacing:2px;
     background:linear-gradient(90deg,var(--accent),var(--accent2));
     -webkit-background-clip:text;background-clip:text;color:transparent;}
   header p{margin:6px 0 0;font-size:13px;color:var(--sub);letter-spacing:1px;}
 
-  /* start */
   #start{display:flex;flex:1;flex-direction:column;justify-content:center;align-items:center;gap:18px;}
   #start .emoji{font-size:64px;animation:bob 2.4s ease-in-out infinite;}
   @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
@@ -45,8 +44,8 @@
   .btn:active{transform:scale(.95);box-shadow:0 4px 12px rgba(255,94,138,.3);}
   .btn.ghost{background:#fff;color:var(--accent);box-shadow:0 4px 14px rgba(0,0,0,.06);}
 
-  /* game */
   #game{display:none;flex:1;flex-direction:column;}
+
   .progress{display:flex;justify-content:space-between;align-items:center;
     font-size:13px;color:var(--sub);padding:4px 6px 10px;}
   .progress .count{font-weight:700;color:var(--accent);font-size:15px;}
@@ -61,7 +60,7 @@
     font-size:22px;font-weight:800;line-height:1.35;cursor:pointer;
     box-shadow:0 10px 26px rgba(180,90,120,.18);
     border:3px solid transparent;transition:transform .12s,border-color .15s,opacity .15s;
-    user-select:none;position:relative;word-break:break-all;
+    user-select:none;word-break:break-all;
   }
   .card small{display:block;font-size:11px;font-weight:600;color:var(--sub);margin-bottom:8px;letter-spacing:2px;}
   .card:active{transform:scale(.97);}
@@ -81,7 +80,84 @@
   .actions .btn{flex:1;padding:11px 0;font-size:13px;}
   .hint{text-align:center;font-size:12px;color:var(--sub);margin-top:10px;letter-spacing:1px;}
 
-  /* winner screen */
+  /* round summary modal */
+  .mask{
+    position:fixed;inset:0;background:rgba(40,20,30,.82);
+    display:none;flex-direction:column;
+    align-items:center;justify-content:center;
+    padding:20px;z-index:100;
+    backdrop-filter:blur(6px);
+  }
+  .mask.show{display:flex;}
+  .round-card{
+    background:#fff;border-radius:28px;
+    width:100%;max-width:480px;
+    display:flex;flex-direction:column;align-items:center;
+    padding:36px 28px 32px;
+    animation:scaleIn .3s ease;
+  }
+  @keyframes scaleIn{from{transform:scale(.88);opacity:0}to{transform:scale(1);opacity:1}}
+  .round-card .tag{
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    color:#fff;border-radius:999px;
+    padding:5px 18px;font-size:12px;font-weight:700;letter-spacing:2px;
+    margin-bottom:16px;
+  }
+  .round-card .subtitle{font-size:13px;color:var(--sub);margin-bottom:20px;}
+  .round-card .chips{
+    display:flex;flex-wrap:wrap;gap:8px;justify-content:center;
+    max-height:320px;overflow-y:auto;padding:4px;
+  }
+  .round-card .chips .chip{
+    font-size:13px;padding:8px 16px;
+    background:#fff5f8;border:2px solid var(--accent);
+    color:var(--accent);border-radius:999px;font-weight:700;
+    box-shadow:0 4px 14px rgba(255,94,138,.2);
+  }
+  .round-card .cta{margin-top:24px;width:100%;}
+  .round-card .cta .btn{width:100%;font-size:18px;padding:16px 0;}
+
+  /* ending screen */
+  #endingMask{background:rgba(30,15,22,.92);}
+  .ending-card{
+    background:linear-gradient(160deg,#fff7fb,#fff3ea);
+    border:2px solid #f4d4e1;
+    border-radius:28px;width:100%;max-width:520px;
+    display:flex;flex-direction:column;align-items:center;
+    padding:28px 24px 26px;
+    animation:scaleIn .3s ease;
+    max-height:88vh;
+  }
+  .ending-card .tag{
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    color:#fff;border-radius:999px;
+    padding:5px 18px;font-size:12px;font-weight:700;letter-spacing:2px;margin-bottom:8px;
+  }
+  .ending-card .subtitle{font-size:13px;color:var(--sub);margin-bottom:18px;text-align:center;}
+  .ending-card .chips{
+    display:flex;flex-wrap:wrap;gap:8px;justify-content:center;
+    overflow-y:auto;padding:6px;align-content:flex-start;
+    max-height:46vh;width:100%;
+  }
+  .ending-card .chips .chip{
+    font-size:13px;padding:8px 14px;
+    background:#fff5f8;border:2px solid var(--accent);
+    color:var(--accent);border-radius:999px;font-weight:700;
+    transition:opacity .8s ease, transform .8s ease, filter .8s ease;
+  }
+  .ending-card .chips .chip.champ{
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    color:#fff;border-color:var(--accent);
+    box-shadow:0 6px 18px rgba(255,94,138,.4);
+  }
+  .ending-card .chips .chip.gone{
+    opacity:0;transform:scale(.55);filter:grayscale(1);
+    pointer-events:none;
+  }
+  .ending-card .cta{margin-top:20px;width:100%;display:flex;gap:10px;}
+  .ending-card .cta .btn{flex:1;padding:13px 0;font-size:15px;}
+
+  /* final screen */
   #final{display:none;flex:1;flex-direction:column;justify-content:center;align-items:center;
     text-align:center;padding:30px 16px;gap:18px;}
   #final .crown{font-size:72px;animation:bob 2.4s ease-in-out infinite;}
@@ -96,13 +172,18 @@
   #final .path-chip{display:inline-block;background:#fff;border:1px solid #f4d4e1;border-radius:8px;
     padding:3px 8px;margin:2px;}
 
-  /* modal */
-  .mask{position:fixed;inset:0;background:rgba(40,20,30,.55);display:none;
-    align-items:center;justify-content:center;padding:20px;z-index:50;backdrop-filter:blur(3px);}
-  .mask.show{display:flex;}
-  .sheet{background:#fff;border-radius:24px;width:100%;max-width:460px;max-height:82vh;
+  /* history sheet */
+  .sheet{
+    position:fixed;inset:0;background:rgba(40,20,30,.55);
+    display:none;align-items:center;justify-content:center;padding:20px;z-index:50;
+    backdrop-filter:blur(3px);
+  }
+  .sheet.show{display:flex;}
+  .sheet .inner{
+    background:#fff;border-radius:24px;width:100%;max-width:460px;max-height:82vh;
     display:flex;flex-direction:column;overflow:hidden;animation:rise .2s ease;
-    position:relative;}
+    position:relative;
+  }
   @keyframes rise{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
   .sheet h2{margin:0;padding:18px 20px 10px;font-size:18px;text-align:center;}
   .sheet .sub{text-align:center;font-size:12px;color:var(--sub);margin-bottom:6px;}
@@ -167,14 +248,41 @@
     <div class="stat" id="finalStat"></div>
     <div class="path" id="path"></div>
     <div class="actions" style="width:100%;max-width:340px;">
-      <button class="btn" onclick="openSheet()">查看完整赛程</button>
+      <button class="btn" onclick="playEnding()">🎬 观看完整淘汰</button>
+      <button class="btn ghost" onclick="openSheet()">完整赛程</button>
       <button class="btn ghost" onclick="resetGame()">重新开始</button>
     </div>
   </section>
 </div>
 
-<div class="mask" id="mask">
-  <div class="sheet">
+<!-- 每轮结束后的晋级大屏 -->
+<div class="mask" id="roundMask">
+  <div class="round-card">
+    <div class="tag" id="maskTag">第1轮 结束</div>
+    <div class="subtitle" id="maskSub">23 位选手晋级</div>
+    <div class="chips" id="maskChips"></div>
+    <div class="cta" id="maskCta">
+      <button class="btn" id="nextRoundBtn" onclick="startNextRound()">开始下一轮</button>
+    </div>
+  </div>
+</div>
+
+<!-- 完整淘汰结尾动画 -->
+<div class="mask" id="endingMask">
+  <div class="ending-card">
+    <div class="tag" id="endingTag">完整淘汰 · 46 位选手</div>
+    <div class="subtitle" id="endingSub">每 3 秒淘汰一轮…</div>
+    <div class="chips" id="endingChips"></div>
+    <div class="cta">
+      <button class="btn ghost" id="endingSkip" onclick="skipEnding()">跳过</button>
+      <button class="btn" id="endingRestart" style="display:none" onclick="resetGame()">重新开始</button>
+    </div>
+  </div>
+</div>
+
+<!-- 完整赛程 -->
+<div class="sheet" id="sheet">
+  <div class="inner">
     <span class="closeX" onclick="closeSheet()">✕</span>
     <h2>完整赛程</h2>
     <div class="sub" id="sheetSub"></div>
@@ -184,13 +292,10 @@
 </div>
 
 <script>
-// 46 个 xp 标签，按表格顺序
 const ITEMS = ["恨海情天","破镜重圆","镜花水月","枯木逢春","烂人真心","圣人私心","明月高悬","欢喜冤家","宿敌变挚友","挚友变宿敌","宿敌","挚友","相爱相杀","师徒","骨科","伪骨科","爱而不得","先婚后爱","强制爱","默默守护","青梅竹马","天降","年上","年下","救赎","一起腐烂","暗恋","明恋","双强","霸总娇妻","追妻火葬场","追夫火葬场","老夫老妻","对抗路","露水姻缘","白头偕老","日久生情","一见钟情","君臣","主仆","前世今生","错位时空","兰因絮果","莞莞类卿","明媒正娶","地下情"];
 
-// 锦标赛对局树：每轮是"上一轮胜者"的两两对决
-// 第1轮：46 个按 A 列顺序两两分组
-// 第2轮：第1轮胜者两两对决 ... 直到冠军
-// 不均匀轮次（46→23→12→6→3→2→1）里，奇数位自动轮空晋级下一轮
+const ROUND_NAMES = ["第1轮 · 46进23","第2轮 · 23进12","第3轮 · 12进6","第4轮 · 6进3","第5轮 · 3进2","决赛 · 冠军"];
+
 function buildBracket(){
   const rounds = [];
   let cur = ITEMS.slice();
@@ -200,28 +305,21 @@ function buildBracket(){
     for(let i=0;i<cur.length;i+=2){
       if(i+1 < cur.length){
         pairings.push([cur[i], cur[i+1]]);
-        next.push(null); // 占位，胜者赛后再填
+        next.push(null);
       } else {
-        // 轮空：直接晋级
         next.push(cur[i]);
       }
     }
     rounds.push(pairings);
     cur = next;
   }
-  return {rounds, slots: rounds.map(()=>[])};
+  return {rounds};
 }
 
 const BR = buildBracket();
 
-// 每轮的标题
-const ROUND_NAMES = ["第1轮 · 46进23","第2轮 · 23进12","第3轮 · 12进6","第4轮 · 6进3","第5轮 · 3进2","决赛 · 冠军"];
-let ri = 0;          // 当前轮次 index
-let pi = 0;          // 当前轮中第几个 pair
-let history = [];    // [{round, idx, a, b, pick, allAfter}] 全程记录
-let winners = [];    // 每轮产生的胜者，索引 ri -> [w1,w2,...]
-let locked = false;
-let totalPicks = 0;
+let ri = 0, pi = 0, history = [], winners = [], totalPicks = 0, locked = false;
+let endingTimers = [];
 
 function loadPair(){
   const pair = BR.rounds[ri][pi];
@@ -251,11 +349,10 @@ function choose(i){
   locked = true;
   const pair = BR.rounds[ri][pi];
   const win = pair[i], lose = pair[1-i];
-  // 记录本场
+
   history.push({round:ri, idx:pi, a:pair[0], b:pair[1], pick:win});
   totalPicks++;
 
-  // 推入本轮胜者
   if(!winners[ri]) winners[ri] = [];
   winners[ri].push(win);
 
@@ -264,42 +361,70 @@ function choose(i){
   document.getElementById(i===0?'cardB':'cardA').classList.add('dim');
   document.getElementById('count').textContent = totalPicks;
 
-  // 是否晋级到下一轮？
   const totalInRound = BR.rounds[ri].length;
-  const winCount = winners[ri].length;
-  const lastWasBye = (ITEMS.length % 2 === 0 ? false : false); // 我们已在 buildBracket 里处理轮空
+
   setTimeout(()=>{
     pi++;
     if(pi < totalInRound){
       loadPair();
     } else {
-      // 本轮结束
-      ri++;
-      pi = 0;
-      // 把胜者写入下一轮的占位
-      const prevWinners = winners[ri-1];
-      // 下一轮的 pair 中第二个元素需要从 winners 里取
-      // 因为 buildBracket 里 next=Array(totalInRound/2).fill(null)，位置 0,2,4...对应 winners[0],winners[2]...
-      for(let i=0,k=0;i<BR.rounds[ri].length;i++){
-        BR.rounds[ri][i][0] = prevWinners[k];
-        BR.rounds[ri][i][1] = prevWinners[k+1];
-        k+=2;
-      }
-      if(BR.rounds[ri].length === 0){
-        // 全部结束
-        showFinal(prevWinners[0]);
-      } else {
-        loadPair();
-      }
+      showRoundSummary(ri, winners[ri]);
     }
   }, 260);
 }
 
+function showRoundSummary(roundIdx, roundWinners){
+  ri = roundIdx + 1;
+  pi = 0;
+  const prevWinners = roundWinners;
+  if(ri < BR.rounds.length){
+    for(let j=0,k=0;j<BR.rounds[ri].length;j++){
+      BR.rounds[ri][j][0] = prevWinners[k] || '';
+      if(prevWinners[k+1] !== undefined){
+        BR.rounds[ri][j][1] = prevWinners[k+1];
+      }
+      k+=2;
+    }
+  }
+
+  const roundName = roundIdx === ROUND_NAMES.length-1 ? '决赛' : ROUND_NAMES[roundIdx];
+  document.getElementById('maskTag').textContent = roundName + ' 结束';
+  const nextLabel = ri < ROUND_NAMES.length ? ROUND_NAMES[ri] : '冠军';
+  document.getElementById('maskSub').textContent = `${roundWinners.length} 位选手晋级 · 进入 ${nextLabel}`;
+
+  const chips = document.getElementById('maskChips');
+  chips.innerHTML = roundWinners.map(w=>`<span class="chip">${w}</span>`).join('');
+
+  const btn = document.getElementById('nextRoundBtn');
+  if(roundWinners.length === 1){
+    btn.textContent = '🏆 查看冠军';
+    btn.onclick = ()=>{
+      document.getElementById('roundMask').classList.remove('show');
+      showFinal(roundWinners[0]);
+    };
+  } else {
+    btn.textContent = '开始下一轮';
+    btn.onclick = startNextRound;
+  }
+
+  document.getElementById('game').style.display = 'none';
+  document.getElementById('roundMask').classList.add('show');
+}
+
+function startNextRound(){
+  document.getElementById('roundMask').classList.remove('show');
+  document.getElementById('game').style.display = 'flex';
+  if(BR.rounds[ri]){
+    loadPair();
+  } else {
+    showFinal(winners[winners.length-1][0]);
+  }
+}
+
 function renderTrail(){
-  // 显示已产生的所有胜者 chip
   const box = document.getElementById('trail');
   const all = [];
-  for(let i=0;i<ri;i++){
+  for(let i=0;i<=ri;i++){
     (winners[i]||[]).forEach(w=>all.push({r:i, w}));
   }
   if(all.length===0){
@@ -316,15 +441,74 @@ function showFinal(champ){
   document.getElementById('finalStat').innerHTML =
     `共经历 <b style="color:var(--accent)">${totalPicks}</b> 次抉择<br>本届冠军已诞生 👑`;
 
-  // 提取冠军的晋级路径：从每一轮 history 里找包含该标签的胜场
   const path = [];
   history.forEach(h=>{ if(h.pick===champ) path.push({r:h.round, beat: h.a===champ?h.b:h.a}); });
   document.getElementById('path').innerHTML = '冠军之路：' +
     path.map(p=>`<span class="path-chip">击败「${p.beat}」</span>`).join(' ');
 }
 
+/* ===== 完整淘汰结尾动画 ===== */
+function buildElimination(){
+  const elim = {};
+  history.forEach(h=>{
+    const loser = h.a === h.pick ? h.b : h.a;
+    elim[loser] = h.round;
+  });
+  const champ = winners[winners.length-1][0];
+  const maxR = history.length ? Math.max.apply(null, history.map(h=>h.round)) : 0;
+  return {elim, champ, maxR};
+}
+
+function playEnding(){
+  const {elim, champ, maxR} = buildElimination();
+  const box = document.getElementById('endingChips');
+  box.innerHTML = ITEMS.map(w=>{
+    const isChamp = (w === champ);
+    const round = isChamp ? 'done' : (elim[w] !== undefined ? elim[w] : 'done');
+    return `<span class="chip${isChamp?' champ':''}" data-round="${round}">${w}</span>`;
+  }).join('');
+
+  document.getElementById('endingMask').classList.add('show');
+  document.getElementById('endingTag').textContent = `完整淘汰 · ${ITEMS.length} 位选手`;
+  document.getElementById('endingSub').textContent = '每 3 秒淘汰一轮…';
+  document.getElementById('endingSkip').style.display = '';
+  document.getElementById('endingRestart').style.display = 'none';
+
+  // 清掉旧计时器
+  endingTimers.forEach(clearTimeout);
+  endingTimers = [];
+
+  let r = 0;
+  function step(){
+    if(r > maxR){
+      document.getElementById('endingSub').textContent = `🏆 最终冠军：${champ}`;
+      document.getElementById('endingTag').textContent = '淘汰完成';
+      document.getElementById('endingSkip').style.display = 'none';
+      document.getElementById('endingRestart').style.display = '';
+      return;
+    }
+    const toRemove = box.querySelectorAll(`.chip[data-round="${r}"]`);
+    toRemove.forEach(el=>el.classList.add('gone'));
+    document.getElementById('endingSub').textContent = `第 ${r+1} 轮已淘汰，剩余 ${box.querySelectorAll('.chip:not(.gone)').length} 位`;
+    r++;
+    endingTimers.push(setTimeout(step, 3000));
+  }
+  endingTimers.push(setTimeout(step, 3000));
+}
+
+function skipEnding(){
+  endingTimers.forEach(clearTimeout);
+  endingTimers = [];
+  const {champ} = buildElimination();
+  const box = document.getElementById('endingChips');
+  box.querySelectorAll('.chip:not(.champ)').forEach(el=>el.classList.add('gone'));
+  document.getElementById('endingSub').textContent = `🏆 最终冠军：${champ}`;
+  document.getElementById('endingTag').textContent = '淘汰完成';
+  document.getElementById('endingSkip').style.display = 'none';
+  document.getElementById('endingRestart').style.display = '';
+}
+
 function openSheet(){
-  // 把 history 按轮分组展示
   const box = document.getElementById('list');
   const byRound = [];
   history.forEach(h=>{
@@ -344,12 +528,14 @@ function openSheet(){
   if(!html) html = '<div class="empty">还没开始呢～</div>';
   box.innerHTML = html;
   document.getElementById('sheetSub').textContent = `共 ${totalPicks} 次抉择 · 走过 ${byRound.filter(Boolean).length} 轮`;
-  document.getElementById('mask').classList.add('show');
+  document.getElementById('sheet').classList.add('show');
 }
-function closeSheet(){ document.getElementById('mask').classList.remove('show'); }
+function closeSheet(){ document.getElementById('sheet').classList.remove('show'); }
 
 function resetGame(){
-  // 重新构建对局树
+  endingTimers.forEach(clearTimeout);
+  endingTimers = [];
+  document.getElementById('endingMask').classList.remove('show');
   const fresh = buildBracket();
   BR.rounds.length = 0;
   fresh.rounds.forEach(r=>BR.rounds.push(r));
@@ -357,6 +543,7 @@ function resetGame(){
   document.getElementById('count').textContent='0';
   document.getElementById('final').style.display='none';
   document.getElementById('game').style.display='flex';
+  document.getElementById('roundMask').classList.remove('show');
   closeSheet();
   loadPair();
 }
@@ -366,7 +553,8 @@ document.getElementById('startBtn').onclick=()=>{
   document.getElementById('game').style.display='flex';
   loadPair();
 };
-document.getElementById('mask').onclick=(e)=>{ if(e.target.id==='mask') closeSheet(); };
+document.getElementById('roundMask').onclick=()=>{};
+document.getElementById('sheet').onclick=(e)=>{ if(e.target.id==='sheet') closeSheet(); };
 </script>
 </body>
 </html>
