@@ -117,6 +117,32 @@
   .round-card .cta{margin-top:24px;width:100%;}
   .round-card .cta .btn{width:100%;font-size:18px;padding:16px 0;}
 
+  /* three-way final */
+  #threeWayMask{background:rgba(30,15,22,.9);}
+  .three-card{
+    background:#fff;border-radius:28px;width:100%;max-width:480px;
+    padding:30px 24px 28px;display:flex;flex-direction:column;align-items:center;
+    animation:scaleIn .3s ease;
+  }
+  .three-card .tag{
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    color:#fff;border-radius:999px;
+    padding:5px 18px;font-size:12px;font-weight:700;letter-spacing:2px;margin-bottom:8px;
+  }
+  .three-card .subtitle{font-size:13px;color:var(--sub);margin-bottom:18px;text-align:center;}
+  .three-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;width:100%;}
+  .tcard{
+    background:var(--card);border:3px solid transparent;border-radius:18px;
+    padding:18px 8px;min-height:120px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+    font-size:16px;font-weight:800;line-height:1.3;cursor:pointer;
+    box-shadow:0 8px 20px rgba(180,90,120,.16);
+    transition:transform .12s,border-color .15s;word-break:break-all;
+  }
+  .tcard small{display:block;font-size:10px;font-weight:600;color:var(--sub);margin-bottom:6px;letter-spacing:1px;}
+  .tcard:active{transform:scale(.96);}
+  .tcard.pick{border-color:var(--accent);background:#fff5f8;}
+
   /* ending screen */
   #endingMask{background:rgba(30,15,22,.92);}
   .ending-card{
@@ -215,7 +241,7 @@
     <div class="bracket-mini">
       第1轮：46进23 → 第2轮：23进12<br>
       第3轮：12进6 → 第4轮：6进3<br>
-      第5轮：3进2 → 决赛：决出冠军 🏆
+      第5轮：三选一 决出冠军 🏆
     </div>
     <button class="btn" id="startBtn">开 始</button>
   </section>
@@ -267,6 +293,15 @@
   </div>
 </div>
 
+<!-- 最后三轮：三选一 -->
+<div class="mask" id="threeWayMask">
+  <div class="three-card">
+    <div class="tag">最后三轮 · 三选一</div>
+    <div class="subtitle">从 3 位中选出你心中的冠军</div>
+    <div class="three-grid" id="threeWayChips"></div>
+  </div>
+</div>
+
 <!-- 完整淘汰结尾动画 -->
 <div class="mask" id="endingMask">
   <div class="ending-card">
@@ -294,7 +329,7 @@
 <script>
 const ITEMS = ["恨海情天","破镜重圆","镜花水月","枯木逢春","烂人真心","圣人私心","明月高悬","欢喜冤家","宿敌变挚友","挚友变宿敌","宿敌","挚友","相爱相杀","师徒","骨科","伪骨科","爱而不得","先婚后爱","强制爱","默默守护","青梅竹马","天降","年上","年下","救赎","一起腐烂","暗恋","明恋","双强","霸总娇妻","追妻火葬场","追夫火葬场","老夫老妻","对抗路","露水姻缘","白头偕老","日久生情","一见钟情","君臣","主仆","前世今生","错位时空","兰因絮果","莞莞类卿","明媒正娶","地下情"];
 
-const ROUND_NAMES = ["第1轮 · 46进23","第2轮 · 23进12","第3轮 · 12进6","第4轮 · 6进3","第5轮 · 3进2","决赛 · 冠军"];
+const ROUND_NAMES = ["第1轮 · 46进23","第2轮 · 23进12","第3轮 · 12进6","第4轮 · 6进3","第5轮 · 三选一决出冠军"];
 
 function buildBracket(){
   const rounds = [];
@@ -320,6 +355,7 @@ const BR = buildBracket();
 
 let ri = 0, pi = 0, history = [], winners = [], totalPicks = 0, locked = false;
 let endingTimers = [];
+let threeWayItems = [], threeWayRound = 0, threeWayLocked = false;
 
 function loadPair(){
   const pair = BR.rounds[ri][pi];
@@ -402,6 +438,9 @@ function showRoundSummary(roundIdx, roundWinners){
       document.getElementById('roundMask').classList.remove('show');
       showFinal(roundWinners[0]);
     };
+  } else if(roundWinners.length === 3){
+    btn.textContent = '开始三选一';
+    btn.onclick = ()=> showThreeWay(roundWinners, ri);
   } else {
     btn.textContent = '开始下一轮';
     btn.onclick = startNextRound;
@@ -419,6 +458,35 @@ function startNextRound(){
   } else {
     showFinal(winners[winners.length-1][0]);
   }
+}
+
+/* ===== 最后三轮：三选一 ===== */
+function showThreeWay(items, roundIdx){
+  const box = document.getElementById('threeWayChips');
+  box.innerHTML = items.map((w,idx)=>`<div class="tcard" id="tw${idx}" onclick="pickThreeWay(${idx})"><small>选这个</small><span>${w}</span></div>`).join('');
+  document.getElementById('roundMask').classList.remove('show');
+  document.getElementById('threeWayMask').classList.add('show');
+  threeWayItems = items;
+  threeWayRound = roundIdx;
+  threeWayLocked = false;
+}
+function pickThreeWay(i){
+  if(threeWayLocked) return;
+  threeWayLocked = true;
+  const champ = threeWayItems[i];
+  // 记录赛果：冠军逐一击败其余两位
+  threeWayItems.forEach(it=>{
+    if(it !== champ) history.push({round:threeWayRound, idx:0, a:champ, b:it, pick:champ});
+  });
+  totalPicks++;
+  if(!winners[threeWayRound]) winners[threeWayRound] = [];
+  winners[threeWayRound].push(champ);
+  document.getElementById('count').textContent = totalPicks;
+  document.getElementById('tw'+i).classList.add('pick');
+  setTimeout(()=>{
+    document.getElementById('threeWayMask').classList.remove('show');
+    showFinal(champ);
+  }, 320);
 }
 
 function renderTrail(){
